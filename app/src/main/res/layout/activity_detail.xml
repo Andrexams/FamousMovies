@@ -12,7 +12,8 @@
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/ll_detail_data">
 
             <ImageView android:layout_width="match_parent"
                        android:layout_height="wrap_content"
@@ -56,5 +57,14 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <TextView
+            android:id="@+id/tv_detail_error_message_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            android:textColor="@android:color/white"/>
 
 </FrameLayout>

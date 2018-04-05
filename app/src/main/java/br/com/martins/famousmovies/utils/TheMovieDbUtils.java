@@ -1,14 +1,12 @@
 package br.com.martins.famousmovies.utils;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -23,19 +21,14 @@ import br.com.martins.famousmovies.model.Movie;
 
 public class TheMovieDbUtils {
 
-    private static final String TAG = TheMovieDbUtils.class.getSimpleName();
-
     private static final String API_KEY = "51e8e2ab21439c2c51d3803c26e32249";
-    private static final String API_KEY_PARAM = "api_key";
 
+    private static final String TAG = TheMovieDbUtils.class.getSimpleName();
+    private static final String API_KEY_PARAM = "api_key";
     private static final String THE_MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3";
     private static final String MOVIE_PATH = "movie";
-
     private static final String THE_MOVIE_DB_IMG_BASE_URL = "http://image.tmdb.org/t/p/w342/";
-
     private static final SimpleDateFormat spdf = new SimpleDateFormat("yyyy-MM-dd");
-
-    //http://image.tmdb.org/t/p/w185/b6ZJZHUdMEFECvGiDpJjlfUWela.jpg
 
     public enum MovieOrderBy {
         popular,
@@ -75,16 +68,32 @@ public class TheMovieDbUtils {
             movieModel.setOriginalTitle(movie.getString("original_title"));
             movieModel.setOverview(movie.getString("overview"));
             movieModel.setVoteAverage(movie.getDouble("vote_average"));
-            movieModel.setBackdropPath(THE_MOVIE_DB_IMG_BASE_URL + movie.getString("backdrop_path"));
-            movieModel.setPosterPath(THE_MOVIE_DB_IMG_BASE_URL + movie.getString("poster_path"));
+
+            String posterPath = movie.getString("poster_path");
+            if(isNotNullEmpty(posterPath)){
+                movieModel.setPosterPath(THE_MOVIE_DB_IMG_BASE_URL + posterPath);
+            }
+
+            String backdropPath = movie.getString("backdrop_path");
+            if(isNotNullEmpty(backdropPath)){
+                movieModel.setBackdropPath(THE_MOVIE_DB_IMG_BASE_URL + backdropPath);
+            }
+
             String sReleaseDate = movie.getString("release_date");
-            movieModel.setReleaseDate(spdf.parse(sReleaseDate));
+            if(isNotNullEmpty(sReleaseDate)){
+                movieModel.setReleaseDate(spdf.parse(sReleaseDate));
+            }
+
             movieList.add(movieModel);
 
         }
         return movieList;
     }
 
-
-
+    public static boolean isNotNullEmpty(String value){
+        if(value != null && !value.isEmpty()){
+            return true;
+        }
+        return false;
+    }
 }

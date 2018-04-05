@@ -2,8 +2,8 @@ package br.com.martins.famousmovies;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -45,7 +45,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerViewMovie.setAdapter(mMovieAdapter);
 
-        loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
+        try{
+            loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
+        }catch (Exception e){
+            Log.e(TAG,"Error on load",e);
+            showErrorMessage(getString(R.string.error_message));
+        }
     }
 
     @Override

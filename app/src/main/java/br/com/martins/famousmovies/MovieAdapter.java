@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -36,9 +37,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         Movie movie = mListMovies.get(position);
-        Picasso.with(holder.itemView.getContext())
-                .load(movie.getPosterPath())
-                .into(holder.mImageViewPoster);
+        if(movie.getPosterPath() != null){
+            Picasso.with(holder.itemView.getContext())
+                    .load(movie.getPosterPath())
+                    .into(holder.mImageViewPoster);
+            holder.mTextViewNoPosterImg.setVisibility(View.GONE);
+        }else{
+            holder.mTextViewNoPosterImg.setText(movie.getOriginalTitle());
+            holder.mTextViewNoPosterImg.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -51,10 +58,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView mImageViewPoster;
+        private TextView mTextViewNoPosterImg;
         public MovieViewHolder(View itemView) {
             super(itemView);
             mImageViewPoster = (ImageView) itemView.findViewById(R.id.iv_poster_movie);
             mImageViewPoster.setOnClickListener(this);
+            mTextViewNoPosterImg = (TextView) itemView.findViewById(R.id.tv_no_poster_img);
+            mTextViewNoPosterImg.setOnClickListener(this);
         }
         @Override
         public void onClick(View view) {

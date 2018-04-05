@@ -1,7 +1,5 @@
 package br.com.martins.famousmovies.model;
 
-import android.content.Intent;
-
 import java.io.Serializable;
 import java.util.Date;
 

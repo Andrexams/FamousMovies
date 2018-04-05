@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -19,11 +21,13 @@ import br.com.martins.famousmovies.model.Movie;
 /**
  * Created by Andre Martins dos Santos on 29/03/2018.
  */
-
 public class DetailActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = DetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "MOVIE";
+
+    private TextView mTextViewDetailErrorMessage;
+    private LinearLayout mLinearLayoutData;
 
     private Movie mMovie;
     private ImageView mImageView;
@@ -32,12 +36,15 @@ public class DetailActivity extends AppCompatActivity {
     private TextView mTextViewDate;
     private TextView mTextViewRate;
 
-    private static final SimpleDateFormat spdf = new SimpleDateFormat("EEE, d MMM yyyy",Locale.US);
+    private static final SimpleDateFormat releaseDateFormat = new SimpleDateFormat("EEE, d MMM yyyy", Locale.US);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        mTextViewDetailErrorMessage = (TextView)findViewById(R.id.tv_detail_error_message_display);
+        mLinearLayoutData = (LinearLayout) findViewById(R.id.ll_detail_data);
 
         mImageView = (ImageView)findViewById(R.id.iv_mini_poster);
         mTextViewTitle = (TextView) findViewById(R.id.tv_movie_title);
@@ -45,20 +52,28 @@ public class DetailActivity extends AppCompatActivity {
         mTextViewDate = (TextView) findViewById(R.id.tv_movie_date);
         mTextViewRate = (TextView) findViewById(R.id.tv_movie_rate);
 
-        Intent intentToOpenDetail = getIntent();
-
-        if(intentToOpenDetail.hasExtra(DetailActivity.EXTRA_MOVIE)){
-            mMovie = (Movie) intentToOpenDetail.getSerializableExtra(EXTRA_MOVIE);
-            loadData();
+        try{
+            Intent intentToOpenDetail = getIntent();
+            if(intentToOpenDetail.hasExtra(DetailActivity.EXTRA_MOVIE)){
+                mMovie = (Movie) intentToOpenDetail.getSerializableExtra(EXTRA_MOVIE);
+                loadData();
+            }
+        }catch (Exception e){
+            Log.e(TAG,"Erro on load detail",e);
+            showErrorMessage(getString(R.string.error_message));
         }
     }
 
     private void loadData(){
+
+        showMovieDataView();
+
         Picasso.with(this)
                 .load(mMovie.getBackdropPath())
                 .into(mImageView);
+
         mTextViewTitle.setText(mMovie.getOriginalTitle());
-        mTextViewDate.setText(spdf.format(mMovie.getReleaseDate()));
+        mTextViewDate.setText(releaseDateFormat.format(mMovie.getReleaseDate()));
         mTextViewOverview.setText(mMovie.getOverview());
 
         Double voteAvg = mMovie.getVoteAverage();
@@ -70,6 +85,17 @@ public class DetailActivity extends AppCompatActivity {
             mTextViewRate.setTextColor(Color.GREEN);
         }
         mTextViewRate.setText(mMovie.getVoteAverage().toString());
+    }
+
+    private void showMovieDataView() {
+        mTextViewDetailErrorMessage.setVisibility(View.INVISIBLE);
+        mLinearLayoutData.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorMessage(String errorMessage) {
+        mLinearLayoutData.setVisibility(View.INVISIBLE);
+        mTextViewDetailErrorMessage.setText(errorMessage);
+        mTextViewDetailErrorMessage.setVisibility(View.VISIBLE);
     }
 
 }

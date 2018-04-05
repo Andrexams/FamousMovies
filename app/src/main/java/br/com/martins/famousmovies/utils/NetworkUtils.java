@@ -26,8 +26,6 @@ import java.util.Scanner;
  */
 public final class NetworkUtils {
 
-    private static final String TAG = NetworkUtils.class.getSimpleName();
-
     /**
      * This method returns the entire result from the HTTP response.
      *

@@ -17,7 +17,7 @@ public class Movie implements Serializable{
     private String posterPath;
     private String backdropPath;
     private Date releaseDate;
-    private Integer voteAverage;
+    private Double voteAverage;
 
     public Long getId() {
         return id;
@@ -59,11 +59,11 @@ public class Movie implements Serializable{
         this.releaseDate = releaseDate;
     }
 
-    public Integer getVoteAverage() {
+    public Double getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(Integer voteAverage) {
+    public void setVoteAverage(Double voteAverage) {
         this.voteAverage = voteAverage;
     }
 

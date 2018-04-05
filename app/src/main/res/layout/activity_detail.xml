@@ -1,9 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary">
+        android:background="@android:color/black">
+
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+        <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+            <ImageView android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_marginTop="16dp"
+                       android:paddingLeft="16dp"
+                       android:id="@+id/iv_mini_poster"
+                       android:adjustViewBounds="true"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:layout_marginTop="2dp"
+                      android:id="@+id/tv_movie_title"
+                      android:textColor="@android:color/white"
+                      android:textSize="24sp"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:layout_marginTop="2dp"
+                      android:id="@+id/tv_movie_date"
+                      android:textColor="@android:color/white"
+                      android:textSize="18sp"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:layout_marginTop="8dp"
+                      android:id="@+id/tv_movie_overview"
+                      android:textColor="@android:color/white"
+                      android:textSize="16sp"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:layout_marginTop="8dp"
+                      android:id="@+id/tv_movie_rate"
+                      android:textColor="@android:color/white"
+                      android:textSize="32sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </FrameLayout>

@@ -11,6 +11,7 @@ import android.util.Log;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +25,17 @@ public class TheMovieDbUtils {
 
     private static final String TAG = TheMovieDbUtils.class.getSimpleName();
 
-    private static final String API_KEY = "replace_with_api_key";
+    private static final String API_KEY = "51e8e2ab21439c2c51d3803c26e32249";
     private static final String API_KEY_PARAM = "api_key";
 
     private static final String THE_MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3";
     private static final String MOVIE_PATH = "movie";
+
+    private static final String THE_MOVIE_DB_IMG_BASE_URL = "http://image.tmdb.org/t/p/w342/";
+
+    private static final SimpleDateFormat spdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    //http://image.tmdb.org/t/p/w185/b6ZJZHUdMEFECvGiDpJjlfUWela.jpg
 
     public enum MovieOrderBy {
         popular,
@@ -52,7 +59,7 @@ public class TheMovieDbUtils {
     }
 
     public static List<Movie> getListMoviesFromJson(Context context, String moviesJsonString)
-            throws JSONException {
+            throws Exception {
 
         List<Movie> movieList = new ArrayList<Movie>();
 
@@ -67,12 +74,11 @@ public class TheMovieDbUtils {
             movieModel.setId(movie.getLong("id"));
             movieModel.setOriginalTitle(movie.getString("original_title"));
             movieModel.setOverview(movie.getString("overview"));
-            movieModel.setPosterPath(movie.getString("poster_path"));
-            movieModel.setVoteAverage(movie.getInt("vote_average"));
-            movieModel.setBackdropPath(movie.getString("backdrop_path"));
-
-            //TODO movieModel.setDate
-
+            movieModel.setVoteAverage(movie.getDouble("vote_average"));
+            movieModel.setBackdropPath(THE_MOVIE_DB_IMG_BASE_URL + movie.getString("backdrop_path"));
+            movieModel.setPosterPath(THE_MOVIE_DB_IMG_BASE_URL + movie.getString("poster_path"));
+            String sReleaseDate = movie.getString("release_date");
+            movieModel.setReleaseDate(spdf.parse(sReleaseDate));
             movieList.add(movieModel);
 
         }

@@ -1,11 +1,12 @@
 package br.com.martins.famousmovies;
 
-import android.content.Context;
+import com.squareup.picasso.Picasso;
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -14,7 +15,6 @@ import br.com.martins.famousmovies.model.Movie;
 /**
  * Created by Andre Martins dos Santos on 29/03/2018.
  */
-
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     private List<Movie> mListMovies;
@@ -35,8 +35,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
-        holder.mTextViewMovieName.setText(mListMovies.get(position).getOriginalTitle());
-        //TODO Carregar o poster do filme
+        Movie movie = mListMovies.get(position);
+        Picasso.with(holder.itemView.getContext())
+                .load(movie.getPosterPath())
+                .into(holder.mImageViewPoster);
     }
 
     @Override
@@ -48,11 +50,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView mTextViewMovieName;
+        private ImageView mImageViewPoster;
         public MovieViewHolder(View itemView) {
             super(itemView);
-            mTextViewMovieName = (TextView) itemView.findViewById(R.id.tv_movie_name);
-            mTextViewMovieName.setOnClickListener(this);
+            mImageViewPoster = (ImageView) itemView.findViewById(R.id.iv_poster_movie);
+            mImageViewPoster.setOnClickListener(this);
         }
         @Override
         public void onClick(View view) {

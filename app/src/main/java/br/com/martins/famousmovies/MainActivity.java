@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.martins.famousmovies.model.Movie;
@@ -39,9 +38,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mProgressBarLoading = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mTextViewErrorMessage = (TextView)  findViewById(R.id.tv_error_message_display);
 
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerViewMovie.setLayoutManager(layoutManager);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        mRecyclerViewMovie.setLayoutManager(gridLayoutManager);
         mRecyclerViewMovie.setHasFixedSize(true);
 
         mMovieAdapter = new MovieAdapter(this);
@@ -153,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @Override
     public void onClick(Movie movie) {
         Intent intent = new Intent(this,DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_MOVIE_ID,movie.getId());
+        intent.putExtra(DetailActivity.EXTRA_MOVIE,movie);
         startActivity(intent);
     }
 }

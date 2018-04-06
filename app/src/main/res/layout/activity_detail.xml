@@ -35,7 +35,7 @@
                       android:paddingLeft="16dp"
                       android:layout_marginTop="2dp"
                       android:id="@+id/tv_movie_date"
-                      android:textColor="@android:color/white"
+                      android:textColor="@android:color/darker_gray"
                       android:textSize="18sp"/>
 
             <TextView android:layout_width="wrap_content"
@@ -53,6 +53,14 @@
                       android:id="@+id/tv_movie_rate"
                       android:textColor="@android:color/white"
                       android:textSize="32sp"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:id="@+id/tv_avg_vote"
+                      android:textColor="@android:color/darker_gray"
+                      android:text="@string/avg_votes"
+                      android:textSize="12sp"/>
 
         </LinearLayout>
 

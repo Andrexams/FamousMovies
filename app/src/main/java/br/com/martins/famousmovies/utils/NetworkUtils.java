@@ -22,6 +22,12 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
+ * André Martins dos Santos
+ * NOTICE: This class was get from network exercises of course Android Developer Nanodegree.
+ */
+
+/**
+ *
  * These utilities will be used to communicate with the weather servers.
  */
 public final class NetworkUtils {

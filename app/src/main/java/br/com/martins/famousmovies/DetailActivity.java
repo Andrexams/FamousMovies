@@ -35,6 +35,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView mTextViewOverview;
     private TextView mTextViewDate;
     private TextView mTextViewRate;
+    private TextView mTextViewPeopleAvgVotesLabel;
 
     private static final SimpleDateFormat releaseDateFormat = new SimpleDateFormat("EEE, d MMM yyyy", Locale.US);
 
@@ -51,6 +52,7 @@ public class DetailActivity extends AppCompatActivity {
         mTextViewOverview = (TextView) findViewById(R.id.tv_movie_overview);
         mTextViewDate = (TextView) findViewById(R.id.tv_movie_date);
         mTextViewRate = (TextView) findViewById(R.id.tv_movie_rate);
+        mTextViewPeopleAvgVotesLabel = (TextView) findViewById(R.id.tv_avg_vote);
 
         try{
             Intent intentToOpenDetail = getIntent();
@@ -77,14 +79,21 @@ public class DetailActivity extends AppCompatActivity {
         mTextViewOverview.setText(mMovie.getOverview());
 
         Double voteAvg = mMovie.getVoteAverage();
-        if(voteAvg < 6){
-            mTextViewRate.setTextColor(Color.RED);
-        }else if(voteAvg >= 6 && voteAvg <= 8){
-            mTextViewRate.setTextColor(Color.YELLOW);
-        }else if(voteAvg > 8) {
-            mTextViewRate.setTextColor(Color.GREEN);
+
+        if(voteAvg != null && voteAvg > 0){
+            if(voteAvg < 6){
+                mTextViewRate.setTextColor(Color.RED);
+            }else if(voteAvg >= 6 && voteAvg <= 8){
+                mTextViewRate.setTextColor(Color.YELLOW);
+            }else if(voteAvg > 8) {
+                mTextViewRate.setTextColor(Color.GREEN);
+            }
+            mTextViewRate.setText(mMovie.getVoteAverage().toString());
+        }else{
+            mTextViewRate.setText(getString(R.string.no_votes));
+            mTextViewRate.setTextSize(22);
+            mTextViewPeopleAvgVotesLabel.setVisibility(View.GONE);
         }
-        mTextViewRate.setText(mMovie.getVoteAverage().toString());
     }
 
     private void showMovieDataView() {

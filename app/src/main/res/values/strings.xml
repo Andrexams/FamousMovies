@@ -4,4 +4,6 @@
     <string name="order_by_popularity">Top Popular</string>
     <string name="error_message">An error occurred. Please try again.</string>
     <string name="no_results">Movies not found.</string>
+    <string name="no_votes">No votes for this movie.</string>
+    <string name="avg_votes">People average votes</string>
 </resources>

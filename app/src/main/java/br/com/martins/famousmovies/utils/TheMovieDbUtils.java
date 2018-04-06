@@ -21,7 +21,7 @@ import br.com.martins.famousmovies.model.Movie;
 
 public class TheMovieDbUtils {
 
-    private static final String API_KEY = "51e8e2ab21439c2c51d3803c26e32249";
+    private static final String API_KEY = "replace_with_your_api_key";
 
     private static final String TAG = TheMovieDbUtils.class.getSimpleName();
     private static final String API_KEY_PARAM = "api_key";

@@ -1,8 +1,12 @@
 package br.com.martins.famousmovies;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -20,23 +25,35 @@ import java.util.List;
 import br.com.martins.famousmovies.model.Movie;
 import br.com.martins.famousmovies.utils.NetworkUtils;
 import br.com.martins.famousmovies.utils.TheMovieDbUtils;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private RecyclerView mRecyclerViewMovie;
+
+    @BindView(R.id.rv_movie)
+    RecyclerView mRecyclerViewMovie;
+
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar mProgressBarLoading;
+
+    @BindView(R.id.tv_error_message_display)
+    TextView mTextViewErrorMessage;
+
+    @BindView(R.id.fl_activity_main)
+    FrameLayout mFrameLayoutActivity;
+
     private MovieAdapter mMovieAdapter;
-    private ProgressBar mProgressBarLoading;
-    private TextView mTextViewErrorMessage;
+
+    private static final String RV_MOVIE_LAYOUT_STATE = "RV_MOVIE_LAYOUT_STATE";
+    private Parcelable savedRecyclerLayoutState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mRecyclerViewMovie = (RecyclerView) findViewById(R.id.rv_movie);
-        mProgressBarLoading = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-        mTextViewErrorMessage = (TextView)  findViewById(R.id.tv_error_message_display);
+        ButterKnife.bind(this);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerViewMovie.setLayoutManager(gridLayoutManager);
@@ -44,12 +61,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerViewMovie.setAdapter(mMovieAdapter);
+        mRecyclerViewMovie.setSaveEnabled(true);
 
-        try{
-            loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
-        }catch (Exception e){
-            Log.e(TAG,"Error on load",e);
-            showErrorMessage(getString(R.string.error_message));
+        loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+       try{
+           outState.putParcelable(RV_MOVIE_LAYOUT_STATE,
+                   mRecyclerViewMovie.getLayoutManager().onSaveInstanceState());
+       }catch (Exception e){
+           Log.e(TAG,"Error on onSaveInstanceState",e);
+       }
+       super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null)
+        {
+            savedRecyclerLayoutState = savedInstanceState
+                    .getParcelable(RV_MOVIE_LAYOUT_STATE);
         }
     }
 
@@ -88,27 +122,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void orderByRating() {
-        try{
-            mMovieAdapter.setListMovies(null);
-            loadMovies(TheMovieDbUtils.MovieOrderBy.top_rated);
-        }catch (Exception e){
-            Log.e(TAG,"Error on orderByRating",e);
-        }
+        mMovieAdapter.setListMovies(null);
+        loadMovies(TheMovieDbUtils.MovieOrderBy.top_rated);
     }
 
     private void orderByPop() {
-        try{
-            mMovieAdapter.setListMovies(null);
-            loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
-        }catch (Exception e){
-            Log.e(TAG,"Error on orderByPop",e);
-        }
+       mMovieAdapter.setListMovies(null);
+       loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
     }
 
-    private void loadMovies(TheMovieDbUtils.MovieOrderBy movieOrderBy){
-       showMovieDataView();
-       URL url = TheMovieDbUtils.buildMovieUrl(movieOrderBy);
-       new SearchMoviesTask().execute(url);
+    private void loadMovies(TheMovieDbUtils.MovieOrderBy orderBy) {
+        try {
+            if(NetworkUtils.isConnectOnNetwork(this)){
+                showMovieDataView();
+                URL url = TheMovieDbUtils.buildMovieUrl(orderBy);
+                new SearchMoviesTask().execute(url);
+            }else{
+                showErrorMessage(getString(R.string.no_internet_message));
+                showSnackRetry(mFrameLayoutActivity,orderBy);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error on load", e);
+            showErrorMessage(getString(R.string.error_message));
+        }
     }
 
     private class SearchMoviesTask extends AsyncTask<URL,Void,List<Movie>>{
@@ -144,8 +180,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                         showErrorMessage(getString(R.string.no_results));
                     }else{
                         mMovieAdapter.setListMovies(listMovie);
+
+                        /*if(lastFirstVisiblePosition != null){
+                            ((GridLayoutManager) mRecyclerViewMovie.getLayoutManager())
+                                    .scrollToPositionWithOffset(lastFirstVisiblePosition,0);
+                        }*/
+                        if(savedRecyclerLayoutState != null){
+                            mRecyclerViewMovie.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+                        }
+
                     }
                 }
+                Log.i(TAG,"onPostExecute");
             }catch (Exception e){
                 this.mException = e;
                 Log.e(TAG,"Error executing SearchMoviesTask.onPostExecute",e);
@@ -159,4 +205,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         intent.putExtra(DetailActivity.EXTRA_MOVIE,movie);
         startActivity(intent);
     }
+
+    private void showSnackRetry(View parent, final TheMovieDbUtils.MovieOrderBy orderBy){
+        Snackbar snackbar = Snackbar
+                .make(parent, null, Snackbar.LENGTH_INDEFINITE)
+                .setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        loadMovies(orderBy);
+                    }
+                });
+        snackbar.setActionTextColor(Color.RED);
+        snackbar.show();
+    }
+
 }

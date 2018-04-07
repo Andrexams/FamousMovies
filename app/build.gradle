@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'api_key', "\"51e8e2ab21439c2c51d3803c26e32249\""
     }
 
     repositories {
@@ -29,5 +30,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'com.android.support:recyclerview-v7:25.4.0'
+    compile 'com.android.support:design:25.4.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

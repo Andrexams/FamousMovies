@@ -15,6 +15,10 @@
  */
 package br.com.martins.famousmovies.utils;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -56,5 +60,15 @@ public final class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static boolean isConnectOnNetwork(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null) {
+            if (connectivityManager.getActiveNetworkInfo().getDetailedState().equals(NetworkInfo.DetailedState.CONNECTED)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

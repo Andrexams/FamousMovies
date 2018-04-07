@@ -5,22 +5,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="br.com.martins.famousmovies.MainActivity"
+        android:id="@+id/fl_activity_main"
         android:background="@android:color/black">
-
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_movie"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-    <TextView
-            android:id="@+id/tv_error_message_display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textSize="20sp"
-            android:visibility="invisible"
-            android:textColor="@android:color/white"/>
 
     <ProgressBar
             android:id="@+id/pb_loading_indicator"
@@ -28,5 +19,15 @@
             android:layout_width="42dp"
             android:layout_gravity="center"
             android:visibility="invisible" />
+
+    <TextView
+            android:id="@+id/tv_error_message_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="16dp"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            android:textColor="@android:color/white"/>
 
 </FrameLayout>

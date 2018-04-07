@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.martins.famousmovies.BuildConfig;
 import br.com.martins.famousmovies.model.Movie;
 
 /**
@@ -21,8 +22,7 @@ import br.com.martins.famousmovies.model.Movie;
 
 public class TheMovieDbUtils {
 
-    private static final String API_KEY = "replace_with_your_api_key";
-
+    private static final String API_KEY = BuildConfig.api_key;
     private static final String TAG = TheMovieDbUtils.class.getSimpleName();
     private static final String API_KEY_PARAM = "api_key";
     private static final String THE_MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3";

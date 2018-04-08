@@ -6,7 +6,7 @@
         android:layout_height="match_parent"
         tools:context="br.com.martins.famousmovies.MainActivity"
         android:id="@+id/fl_activity_main"
-        android:background="@android:color/black">
+        android:background="@color/colorPrimaryDark">
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_movie"

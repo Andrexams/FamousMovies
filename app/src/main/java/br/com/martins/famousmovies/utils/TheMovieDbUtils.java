@@ -51,10 +51,10 @@ public class TheMovieDbUtils {
         return url;
     }
 
-    public static List<Movie> getListMoviesFromJson(Context context, String moviesJsonString)
+    public static List<Movie> getListMoviesFromJson(String moviesJsonString)
             throws Exception {
 
-        List<Movie> movieList = new ArrayList<Movie>();
+        List<Movie> movieList = new ArrayList<>();
 
         JSONObject forecastJson = new JSONObject(moviesJsonString);
         JSONArray resultsArray = forecastJson.getJSONArray("results");
@@ -65,21 +65,21 @@ public class TheMovieDbUtils {
 
             Movie movieModel = new Movie();
             movieModel.setId(movie.getLong("id"));
-            movieModel.setOriginalTitle(movie.getString("original_title"));
-            movieModel.setOverview(movie.getString("overview"));
-            movieModel.setVoteAverage(movie.getDouble("vote_average"));
+            movieModel.setOriginalTitle(movie.optString("original_title"));
+            movieModel.setOverview(movie.optString("overview"));
+            movieModel.setVoteAverage(movie.optDouble("vote_average"));
 
-            String posterPath = movie.getString("poster_path");
+            String posterPath = movie.optString("poster_path");
             if(isNotNullEmpty(posterPath)){
                 movieModel.setPosterPath(THE_MOVIE_DB_IMG_BASE_URL + posterPath);
             }
 
-            String backdropPath = movie.getString("backdrop_path");
+            String backdropPath = movie.optString("backdrop_path");
             if(isNotNullEmpty(backdropPath)){
                 movieModel.setBackdropPath(THE_MOVIE_DB_IMG_BASE_URL + backdropPath);
             }
 
-            String sReleaseDate = movie.getString("release_date");
+            String sReleaseDate = movie.optString("release_date");
             if(isNotNullEmpty(sReleaseDate)){
                 movieModel.setReleaseDate(spdf.parse(sReleaseDate));
             }
@@ -91,9 +91,6 @@ public class TheMovieDbUtils {
     }
 
     public static boolean isNotNullEmpty(String value){
-        if(value != null && !value.isEmpty()){
-            return true;
-        }
-        return false;
+        return (value != null && !value.isEmpty());
     }
 }

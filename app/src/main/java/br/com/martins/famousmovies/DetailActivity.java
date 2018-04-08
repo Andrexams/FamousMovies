@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import br.com.martins.famousmovies.model.Movie;
 import br.com.martins.famousmovies.utils.NetworkUtils;
-import br.com.martins.famousmovies.utils.TheMovieDbUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -71,7 +70,8 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intentToOpenDetail = getIntent();
         if (intentToOpenDetail.hasExtra(DetailActivity.EXTRA_MOVIE)) {
-            mMovie = (Movie) intentToOpenDetail.getSerializableExtra(EXTRA_MOVIE);
+            Bundle bundle = intentToOpenDetail.getExtras();
+            mMovie = (Movie) bundle.getParcelable(EXTRA_MOVIE);
             loadData();
         }
     }
@@ -110,7 +110,7 @@ public class DetailActivity extends AppCompatActivity {
                 showSnackRetry(mLinearLayoutData);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Erro on load detail", e);
+            Log.e(TAG, "Error on load detail", e);
             showErrorMessage(getString(R.string.error_message));
             showSnackRetry(mFrameLayoutDetail);
         }
@@ -129,8 +129,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private void showSnackRetry(View parent){
         Snackbar snackbar = Snackbar
-                .make(parent, null, Snackbar.LENGTH_INDEFINITE)
-                .setAction("RETRY", new View.OnClickListener() {
+                .make(parent, "", Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         loadData();

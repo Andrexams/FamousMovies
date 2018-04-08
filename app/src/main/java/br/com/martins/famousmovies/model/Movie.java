@@ -1,5 +1,8 @@
 package br.com.martins.famousmovies.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,7 +10,7 @@ import java.util.Date;
  * Created by Andre Martins dos Santos on 02/04/2018.
  */
 
-public class Movie implements Serializable{
+public class Movie implements Parcelable{
 
     private Long id;
     private String originalTitle;
@@ -16,6 +19,8 @@ public class Movie implements Serializable{
     private String backdropPath;
     private Date releaseDate;
     private Double voteAverage;
+
+    public Movie(){}
 
     public Long getId() {
         return id;
@@ -86,5 +91,41 @@ public class Movie implements Serializable{
     @Override
     public int hashCode() {
         return id.intValue() * Integer.MIN_VALUE;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    private Movie(Parcel from){
+        id = from.readLong();
+        originalTitle = from.readString();
+        posterPath = from.readString();
+        backdropPath = from.readString();
+        overview = from.readString();
+        voteAverage = from.readDouble();
+        releaseDate = (Date)from.readSerializable();
+    }
+
+    public static final Parcelable.Creator<Movie>
+            CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(originalTitle);
+        parcel.writeString(posterPath);
+        parcel.writeString(backdropPath);
+        parcel.writeString(overview);
+        parcel.writeDouble(voteAverage);
+        parcel.writeSerializable(releaseDate);
     }
 }

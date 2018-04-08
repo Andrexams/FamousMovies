@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,12 +22,13 @@ import java.net.URL;
 import java.util.List;
 
 import br.com.martins.famousmovies.model.Movie;
+import br.com.martins.famousmovies.service.SearchMovieService;
 import br.com.martins.famousmovies.utils.NetworkUtils;
 import br.com.martins.famousmovies.utils.TheMovieDbUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler,AsyncTaskDelegate {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             if(NetworkUtils.isConnectOnNetwork(this)){
                 showMovieDataView();
                 URL url = TheMovieDbUtils.buildMovieUrl(orderBy);
-                new SearchMoviesTask().execute(url);
+                new SearchMovieService(this,this).execute(url);
             }else{
                 showErrorMessage(getString(R.string.no_internet_message));
                 showSnackRetry(mFrameLayoutActivity,orderBy);
@@ -147,56 +147,36 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
-    private class SearchMoviesTask extends AsyncTask<URL,Void,List<Movie>>{
+    @Override
+    public void onPreExecute() {
+        mProgressBarLoading.setVisibility(View.VISIBLE);
+    }
 
-        private Exception mException;
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBarLoading.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected List<Movie> doInBackground(URL... url) {
-            try {
-                String jsonMoviesResponse = NetworkUtils.getResponseFromHttpUrl(url[0]);
-                List<Movie> listMovie = TheMovieDbUtils.getListMoviesFromJson(MainActivity.this, jsonMoviesResponse);
-                return listMovie;
-            } catch (Exception e) {
-                this.mException = e;
-                Log.e(TAG, "Error executing SearchMoviesTask.doInBackground", e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Movie> listMovie) {
-            try{
+    @Override
+    public void onPostExecute(Object output) {
+        try {
+            if(output != null){
+                List<Movie> listMovie = (List<Movie>) output;
                 mProgressBarLoading.setVisibility(View.INVISIBLE);
-                if(mException != null){
-                    showErrorMessage(getString(R.string.error_message));
-                }else{
-                    if(listMovie == null || listMovie.isEmpty()){
-                        showErrorMessage(getString(R.string.no_results));
-                    }else{
-                        mMovieAdapter.setListMovies(listMovie);
-
-                        /*if(lastFirstVisiblePosition != null){
-                            ((GridLayoutManager) mRecyclerViewMovie.getLayoutManager())
-                                    .scrollToPositionWithOffset(lastFirstVisiblePosition,0);
-                        }*/
-                        if(savedRecyclerLayoutState != null){
-                            mRecyclerViewMovie.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-                        }
-
+                if (listMovie == null || listMovie.isEmpty()) {
+                    showErrorMessage(getString(R.string.no_results));
+                } else {
+                    mMovieAdapter.setListMovies(listMovie);
+                    if (savedRecyclerLayoutState != null) {
+                        mRecyclerViewMovie.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
                     }
                 }
-                Log.i(TAG,"onPostExecute");
-            }catch (Exception e){
-                this.mException = e;
-                Log.e(TAG,"Error executing SearchMoviesTask.onPostExecute",e);
+            }else{
+                showErrorMessage(getString(R.string.no_results));
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Error executing AsyncTaskDelegate.onPostExecute", e);
         }
+    }
+
+    @Override
+    public void onException(Exception e) {
+        showErrorMessage(getString(R.string.error_message));
     }
 
     @Override
@@ -208,8 +188,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void showSnackRetry(View parent, final TheMovieDbUtils.MovieOrderBy orderBy){
         Snackbar snackbar = Snackbar
-                .make(parent, null, Snackbar.LENGTH_INDEFINITE)
-                .setAction("RETRY", new View.OnClickListener() {
+                .make(parent, "", Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         loadMovies(orderBy);
@@ -218,5 +198,4 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         snackbar.setActionTextColor(Color.RED);
         snackbar.show();
     }
-
 }

@@ -2,7 +2,7 @@ package br.com.martins.famousmovies;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.List;
 
 import br.com.martins.famousmovies.model.Movie;
+import br.com.martins.famousmovies.persistence.MovieContract;
 import br.com.martins.famousmovies.service.SearchMovieService;
 import br.com.martins.famousmovies.utils.NetworkUtils;
 import br.com.martins.famousmovies.utils.TheMovieDbUtils;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerViewMovie.setAdapter(mMovieAdapter);
         mRecyclerViewMovie.setSaveEnabled(true);
 
-        loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
+        loadMovies(TheMovieDbUtils.MovieCategory.popular);
     }
 
     @Override
@@ -104,10 +105,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             case (R.id.action_order_by_rating):
                 orderByRating();
                 break;
+            case (R.id.action_favorites):
+                showFavorites();
+                break;
             default:
                 return false;
         }
         return true;
+    }
+
+    private void showFavorites() {
+        mMovieAdapter.setListMovies(null);
+        loadMovies(TheMovieDbUtils.MovieCategory.favorites_from_content_provider);
     }
 
     private void showMovieDataView() {
@@ -123,28 +132,51 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void orderByRating() {
         mMovieAdapter.setListMovies(null);
-        loadMovies(TheMovieDbUtils.MovieOrderBy.top_rated);
+        loadMovies(TheMovieDbUtils.MovieCategory.top_rated);
     }
 
     private void orderByPop() {
        mMovieAdapter.setListMovies(null);
-       loadMovies(TheMovieDbUtils.MovieOrderBy.popular);
+       loadMovies(TheMovieDbUtils.MovieCategory.popular);
     }
 
-    private void loadMovies(TheMovieDbUtils.MovieOrderBy orderBy) {
+    private void loadMovies(TheMovieDbUtils.MovieCategory movieCategory) {
         try {
             if(NetworkUtils.isConnectOnNetwork(this)){
+
                 showMovieDataView();
-                URL url = TheMovieDbUtils.buildMovieUrl(orderBy);
-                new SearchMovieService(this,this).execute(url);
+
+                if(movieCategory.equals(TheMovieDbUtils.MovieCategory.popular)
+                        || movieCategory.equals(TheMovieDbUtils.MovieCategory.top_rated)){
+
+                    URL url = TheMovieDbUtils.buildMovieUrl(movieCategory);
+                    new SearchMovieService(this,this).execute(url);
+
+                }else if(movieCategory.equals(TheMovieDbUtils.MovieCategory.favorites_from_content_provider)){
+
+                    searchFavorites();
+
+                }
             }else{
-                showErrorMessage(getString(R.string.no_internet_message));
-                showSnackRetry(mFrameLayoutActivity,orderBy);
+                if(movieCategory.equals(TheMovieDbUtils.MovieCategory.favorites_from_content_provider)){
+
+                    searchFavorites();
+
+                }else{
+
+                    showErrorMessage(getString(R.string.no_internet_message));
+                    showSnackRetry(mFrameLayoutActivity,movieCategory);
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Error on load", e);
             showErrorMessage(getString(R.string.error_message));
         }
+    }
+
+    private void searchFavorites() {
+        Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+        new SearchMovieService(this,this).execute(uri);
     }
 
     @Override
@@ -186,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         startActivity(intent);
     }
 
-    private void showSnackRetry(View parent, final TheMovieDbUtils.MovieOrderBy orderBy){
+    private void showSnackRetry(View parent, final TheMovieDbUtils.MovieCategory orderBy){
         Snackbar snackbar = Snackbar
                 .make(parent, "", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.retry, new View.OnClickListener() {

@@ -22,25 +22,22 @@
                        android:layout_marginTop="16dp"
                        android:paddingLeft="16dp"
                        android:id="@+id/iv_mini_poster"
-                       android:adjustViewBounds="true"/>
+                       android:adjustViewBounds="true"
+                       android:contentDescription="@string/content_desc_poster"/>
 
-
-
-                <TextView android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_marginTop="2dp"
-                          android:paddingLeft="16dp"
-                          android:id="@+id/tv_movie_title"
-                          android:textColor="@android:color/white"
-                          android:textSize="24sp"/>
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="2dp"
+                      android:paddingLeft="16dp"
+                      android:id="@+id/tv_movie_title"
+                      style="@style/LargeText"/>
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:paddingLeft="16dp"
                       android:layout_marginTop="2dp"
                       android:id="@+id/tv_movie_date"
-                      android:textColor="@android:color/darker_gray"
-                      android:textSize="18sp"/>
+                      style="@style/SectionText"/>
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -59,8 +56,7 @@
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:id="@+id/tv_movie_rate"
-                          android:textColor="@android:color/white"
-                          android:textSize="32sp"/>
+                          style="@style/ExtraLargeText"/>
 
                 <ImageView android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
@@ -68,18 +64,38 @@
                            android:layout_marginLeft="15dp"
                            android:layout_gravity="center_vertical"
                            android:id="@+id/iv_favorite"
-                           android:background="@android:drawable/star_big_off"
                            android:onClick="setFavorite"/>
             </LinearLayout>
-
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:paddingLeft="16dp"
-                      android:id="@+id/tv_avg_vote"
-                      android:textColor="@android:color/darker_gray"
-                      android:text="@string/avg_votes"
-                      android:textSize="12sp"/>
+                      android:layout_marginTop="8dp"
+                      android:id="@+id/tv_videos"
+                      android:text="@string/videos"
+                      style="@style/SectionText"/>
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingLeft="16dp"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:layout_marginTop="8dp"
+                      android:id="@+id/tv_people_review"
+                      android:text="@string/reviews"
+                      style="@style/SectionText"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dp"
+                      android:paddingLeft="16dp"
+                      android:id="@+id/tv_reviews"
+                      style="@style/ContentItalicText"/>
 
         </LinearLayout>
 
@@ -91,8 +107,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:padding="16dp"
-            android:textSize="20sp"
             android:visibility="invisible"
-            android:textColor="@android:color/white"/>
+            style="@style/ContentText"/>
+
+    <ProgressBar
+            android:id="@+id/pb_loading_indicator"
+            android:layout_height="42dp"
+            android:layout_width="42dp"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
 
 </FrameLayout>

@@ -10,13 +10,13 @@
                android:id="@+id/iv_poster_movie"
                android:adjustViewBounds="true"
                android:layout_marginLeft="2dp"
-               android:layout_marginTop="2dp"/>
+               android:layout_marginTop="2dp"
+               android:contentDescription="@string/content_desc_poster"/>
 
     <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:id="@+id/tv_no_poster_img"
               android:visibility="gone"
-              android:textColor="@android:color/white"
-              android:textSize="22sp"/>
+              style="@style/ContentText"/>
 
 </LinearLayout>

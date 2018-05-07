@@ -39,18 +39,19 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+
         Cursor cursor = null;
         switch (mUriMatcher.match(uri)) {
             case CODE_MOVIE:
                 SQLiteDatabase readableDatabase = mMovieDbHelper.getReadableDatabase();
                 cursor = readableDatabase.query(MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
                         null,
                         null,
-                        null,
-                        null,
-                        null,
-                        MovieEntry.COLUMN_RELEASE_DATE,
+                        sortOrder,
                         null);
                 break;
             default:
@@ -86,7 +87,7 @@ public class MovieProvider extends ContentProvider {
         switch (mUriMatcher.match(uri)) {
             case CODE_MOVIE:
                 SQLiteDatabase writableDatabase = mMovieDbHelper.getWritableDatabase();
-                rows = writableDatabase.delete(MovieEntry.TABLE_NAME,"_id=?",selectionArgs);
+                rows = writableDatabase.delete(MovieEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

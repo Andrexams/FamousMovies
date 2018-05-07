@@ -25,13 +25,15 @@ import br.com.martins.famousmovies.model.Movie;
 import br.com.martins.famousmovies.persistence.MovieContract;
 import br.com.martins.famousmovies.service.SearchMovieService;
 import br.com.martins.famousmovies.utils.NetworkUtils;
-import br.com.martins.famousmovies.utils.TheMovieDbUtils;
+import br.com.martins.famousmovies.utils.TheMovieDbApi;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler,AsyncTaskDelegate {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static final int ACTION_DETAILS = 1000;
 
     @BindView(R.id.rv_movie)
     RecyclerView mRecyclerViewMovie;
@@ -48,7 +50,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private MovieAdapter mMovieAdapter;
 
     private static final String RV_MOVIE_LAYOUT_STATE = "RV_MOVIE_LAYOUT_STATE";
+    private static final String MN_MOVIE_SELECTED = "MN_MOVIE_SELECTED";
     private Parcelable savedRecyclerLayoutState;
+
+    private TheMovieDbApi.MovieCategory selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerViewMovie.setAdapter(mMovieAdapter);
         mRecyclerViewMovie.setSaveEnabled(true);
 
-        loadMovies(TheMovieDbUtils.MovieCategory.popular);
+        if(savedInstanceState != null)
+        {
+            doRestoreInstanceActions(savedInstanceState);
+        }
+
+        doActionLoad();
+    }
+
+    private void doActionLoad() {
+        selected = selected != null ? selected : TheMovieDbApi.MovieCategory.popular;
+        loadMovies(selected);
     }
 
     @Override
@@ -72,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
        try{
            outState.putParcelable(RV_MOVIE_LAYOUT_STATE,
                    mRecyclerViewMovie.getLayoutManager().onSaveInstanceState());
+
+           outState.putString(MN_MOVIE_SELECTED,selected.name());
+
        }catch (Exception e){
            Log.e(TAG,"Error on onSaveInstanceState",e);
        }
@@ -83,8 +101,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         super.onRestoreInstanceState(savedInstanceState);
         if(savedInstanceState != null)
         {
+            doRestoreInstanceActions(savedInstanceState);
+        }
+    }
+
+    private void doRestoreInstanceActions(Bundle savedInstanceState) {
+        try{
             savedRecyclerLayoutState = savedInstanceState
                     .getParcelable(RV_MOVIE_LAYOUT_STATE);
+            if(savedInstanceState.getString(MN_MOVIE_SELECTED) != null){
+                selected = TheMovieDbApi.MovieCategory.valueOf(savedInstanceState.getString(MN_MOVIE_SELECTED));
+            }
+        }catch (Exception e){
+            Log.e(TAG,"Error on doRestoreInstanceActions",e);
         }
     }
 
@@ -116,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void showFavorites() {
         mMovieAdapter.setListMovies(null);
-        loadMovies(TheMovieDbUtils.MovieCategory.favorites_from_content_provider);
+        loadMovies(TheMovieDbApi.MovieCategory.favorites_from_content_provider);
     }
 
     private void showMovieDataView() {
@@ -132,33 +161,36 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void orderByRating() {
         mMovieAdapter.setListMovies(null);
-        loadMovies(TheMovieDbUtils.MovieCategory.top_rated);
+        loadMovies(TheMovieDbApi.MovieCategory.top_rated);
     }
 
     private void orderByPop() {
        mMovieAdapter.setListMovies(null);
-       loadMovies(TheMovieDbUtils.MovieCategory.popular);
+       loadMovies(TheMovieDbApi.MovieCategory.popular);
     }
 
-    private void loadMovies(TheMovieDbUtils.MovieCategory movieCategory) {
+    private void loadMovies(TheMovieDbApi.MovieCategory movieCategory) {
         try {
+
+            selected = movieCategory;
+
             if(NetworkUtils.isConnectOnNetwork(this)){
 
                 showMovieDataView();
 
-                if(movieCategory.equals(TheMovieDbUtils.MovieCategory.popular)
-                        || movieCategory.equals(TheMovieDbUtils.MovieCategory.top_rated)){
+                if(movieCategory.equals(TheMovieDbApi.MovieCategory.popular)
+                        || movieCategory.equals(TheMovieDbApi.MovieCategory.top_rated)){
 
-                    URL url = TheMovieDbUtils.buildMovieUrl(movieCategory);
+                    URL url = TheMovieDbApi.buildMovieUrl(movieCategory);
                     new SearchMovieService(this,this).execute(url);
 
-                }else if(movieCategory.equals(TheMovieDbUtils.MovieCategory.favorites_from_content_provider)){
+                }else if(movieCategory.equals(TheMovieDbApi.MovieCategory.favorites_from_content_provider)){
 
                     searchFavorites();
 
                 }
             }else{
-                if(movieCategory.equals(TheMovieDbUtils.MovieCategory.favorites_from_content_provider)){
+                if(movieCategory.equals(TheMovieDbApi.MovieCategory.favorites_from_content_provider)){
 
                     searchFavorites();
 
@@ -191,7 +223,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 List<Movie> listMovie = (List<Movie>) output;
                 mProgressBarLoading.setVisibility(View.INVISIBLE);
                 if (listMovie == null || listMovie.isEmpty()) {
-                    showErrorMessage(getString(R.string.no_results));
+
+                    String msg = selected.equals(TheMovieDbApi.MovieCategory.favorites_from_content_provider) ?
+                            getString(R.string.no_favorites_results) :
+                            getString(R.string.no_results);
+
+                    showErrorMessage(msg);
                 } else {
                     mMovieAdapter.setListMovies(listMovie);
                     if (savedRecyclerLayoutState != null) {
@@ -199,6 +236,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     }
                 }
             }else{
+                String msg = getString(R.string.no_results);
+                if(selected.equals(TheMovieDbApi.MovieCategory.favorites_from_content_provider)){
+                    msg = getString(R.string.no_favorites_results);
+                }
                 showErrorMessage(getString(R.string.no_results));
             }
         } catch (Exception e) {
@@ -215,10 +256,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public void onClick(Movie movie) {
         Intent intent = new Intent(this,DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_MOVIE,movie);
-        startActivity(intent);
+        startActivityForResult(intent,1000);
     }
 
-    private void showSnackRetry(View parent, final TheMovieDbUtils.MovieCategory orderBy){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case ACTION_DETAILS:
+                if(selected.equals(TheMovieDbApi.MovieCategory.favorites_from_content_provider) &&
+                        resultCode == DetailActivity.ACTION_RESULT_RELOAD)
+                    doActionLoad();
+                break;
+            default:
+        }
+    }
+
+    private void showSnackRetry(View parent, final TheMovieDbApi.MovieCategory orderBy){
         Snackbar snackbar = Snackbar
                 .make(parent, "", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.retry, new View.OnClickListener() {

@@ -19,8 +19,11 @@ public class Movie implements Parcelable{
     private String backdropPath;
     private Date releaseDate;
     private Double voteAverage;
+    private Boolean favorite;
 
-    public Movie(){}
+    public Movie(){
+        favorite = Boolean.FALSE;
+    }
 
     public Long getId() {
         return id;
@@ -78,6 +81,14 @@ public class Movie implements Parcelable{
         this.backdropPath = backdropPath;
     }
 
+    public Boolean getFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        this.favorite = favorite;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Movie){
@@ -106,6 +117,7 @@ public class Movie implements Parcelable{
         overview = from.readString();
         voteAverage = from.readDouble();
         releaseDate = (Date)from.readSerializable();
+        favorite = from.readByte() != 0;
     }
 
     public static final Parcelable.Creator<Movie>
@@ -127,5 +139,6 @@ public class Movie implements Parcelable{
         parcel.writeString(overview);
         parcel.writeDouble(voteAverage);
         parcel.writeSerializable(releaseDate);
+        parcel.writeByte((byte) (favorite ? 1 : 0));
     }
 }

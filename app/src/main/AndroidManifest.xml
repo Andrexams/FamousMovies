@@ -25,6 +25,11 @@
                   android:parentActivityName=".MainActivity">
         </activity>
 
+        <provider android:authorities="br.com.martins.famousmovies"
+                  android:name=".provider.MovieProvider"
+                  android:exported="false">
+        </provider>
+
     </application>
 
 </manifest>

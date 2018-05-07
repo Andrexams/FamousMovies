@@ -1,7 +1,6 @@
 package br.com.martins.famousmovies.service;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -11,8 +10,9 @@ import java.util.List;
 
 import br.com.martins.famousmovies.AsyncTaskDelegate;
 import br.com.martins.famousmovies.model.Movie;
+import br.com.martins.famousmovies.persistence.FavoriteMovieDao;
 import br.com.martins.famousmovies.utils.NetworkUtils;
-import br.com.martins.famousmovies.utils.TheMovieDbUtils;
+import br.com.martins.famousmovies.utils.TheMovieDbApi;
 
 /**
  * Created by Andre Martins dos Santos on 08/04/2018.
@@ -42,18 +42,11 @@ public class SearchMovieService extends AsyncTask<Object,Void,List<Movie>>  {
 
                 URL url = (URL)obj;
                 String jsonMoviesResponse = NetworkUtils.getResponseFromHttpUrl(url);
-                return TheMovieDbUtils.getListMoviesFromJson(jsonMoviesResponse);
+                return TheMovieDbApi.getListMoviesFromJson(jsonMoviesResponse);
 
             }else if(obj instanceof Uri){
 
-                Uri uri = (Uri)obj;
-                Cursor query = mContext.getContentResolver().query(uri,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-                return TheMovieDbUtils.getListMoviesFromCursor(query);
+                return FavoriteMovieDao.getListFavorites(mContext);
             }
 
         } catch (Exception e) {
